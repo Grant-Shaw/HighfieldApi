@@ -1,8 +1,8 @@
-﻿using RecruitmentApiClient.Abstractions;
+﻿using SharedModels;
 
 namespace RecruitmentApiClient;
 
 public interface IRecruitmentApiClient
 {
-    Task<List<UserData>> GetUserDataAsync();
+    Task<IEnumerable<User>> GetUserDataAsync();
 }
