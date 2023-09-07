@@ -1,70 +1,87 @@
-﻿using SharedModels;
+﻿using Microsoft.Extensions.Logging;
+using SharedModels;
 
 namespace UserDataProcessor;
 
 public class UserDataProcessor : IUserDataProcessor
 {
+    private readonly ILogger<UserDataProcessor> _logger;
+
+    public UserDataProcessor(ILogger<UserDataProcessor> logger) 
+    {
+        _logger = logger;
+    }
+
     public IEnumerable<UserAgePlusTwentyDTO> GetAgePlusTwentyData(List<User> userData)
     {
         List<UserAgePlusTwentyDTO> agePlusTwentyData = new();
 
-        if (userData == null || !userData.Any())
-        {
-            throw new ArgumentNullException(nameof(userData), "User data is null or empty.");
-        }
-
         foreach (var user in userData)
         {
-            if (!string.IsNullOrEmpty(user.Dob))
+            try
             {
-                if (DateTime.TryParse(user.Dob, out DateTime dob))
+                if (!string.IsNullOrEmpty(user.Dob))
                 {
-                    var age = CalculateAge(dob);
-                    var agePlusTwenty = CalculateAgePlusTwenty(age);
-
-                    agePlusTwentyData.Add(new UserAgePlusTwentyDTO
+                    if (DateTime.TryParse(user.Dob, out DateTime dob))
                     {
-                        UserId = user.Id,
-                        OriginalAge = age,
-                        AgePlusTwenty = agePlusTwenty
-                    });
+                        var age = CalculateAge(dob);
+                        var agePlusTwenty = CalculateAgePlusTwenty(age);
+
+                        agePlusTwentyData.Add(new UserAgePlusTwentyDTO
+                        {
+                            UserId = user.Id,
+                            OriginalAge = age,
+                            AgePlusTwenty = agePlusTwenty
+                        });
+                    }
+                    else
+                    {
+                        throw new InvalidDataException("The users date of birth is not in the correct format.");
+                    }
                 }
                 else
                 {
-                    throw new InvalidDataException($"The user {user.Id} date of birth is not in the correct format");
+                    throw new InvalidDataException("The Users date of birth is null or empty");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                throw new InvalidDataException($"The user {user.Id} does not have a date of birth.");
+                // Log an error message for any other exceptions
+                _logger.LogError($"An error occurred for user {user.Id}: {ex.Message}");
+                throw;
             }
         }
 
         return agePlusTwentyData;
     }
+
     public IEnumerable<UserColorFrequencyDTO> GetColourFrequencyData(List<User> userData)
     {
-        if (userData == null || !userData.Any())
-        {
-            throw new ArgumentNullException(nameof(userData), "User data is null or empty.");
-        }
 
         Dictionary<string, int> colorFrequencies = new();
 
         foreach (var user in userData)
         {
-            if (!string.IsNullOrWhiteSpace(user.FavouriteColour))
+            try
             {
-                string color = user.FavouriteColour.Trim().ToLower();
+                if (!string.IsNullOrWhiteSpace(user.FavouriteColour))
+                {
+                    string color = user.FavouriteColour.Trim().ToLower();
 
-                if (colorFrequencies.ContainsKey(color))
-                {
-                    colorFrequencies[color]++;
+                    if (colorFrequencies.ContainsKey(color))
+                    {
+                        colorFrequencies[color]++;
+                    }
+                    else
+                    {
+                        colorFrequencies[color] = 1;
+                    }
                 }
-                else
-                {
-                    colorFrequencies[color] = 1;
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred for user {user.Id}: {ex.Message}");
+                throw;
             }
         }
 
@@ -79,7 +96,7 @@ public class UserDataProcessor : IUserDataProcessor
             .ToList();
 
         return colorFrequencyData;
-}
+    }
 
     private int CalculateAge(DateTime dateOfBirth)
     {
