@@ -4,5 +4,5 @@ namespace RecruitmentApiClient;
 
 public interface IRecruitmentApiClient
 {
-    Task<IEnumerable<User>> GetUserDataAsync();
+    Task <List<User>> GetUserDataAsync();
 }

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentApiClient;
+using SharedModels;
+using UserDataProcessor;
 
 namespace HighfieldApi.Controllers;
 
@@ -17,51 +19,30 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("UserData")]
-    public async Task<IActionResult> GetRawUserDataAsync()
+    public async Task<IActionResult> GetUserDataAsync()
     {
         try
         {
             // Fetch user data from the recruitment API
             var userData = await _recruitmentApiClient.GetUserDataAsync();
 
-            if (userData == null || userData.Count == 0)
-            {
-                return NotFound("No user data found.");
-            }
-
-            return Ok(userData);
-        }
-        catch (Exception ex)
-        {
-            // Handle exceptions and log errors
-            return StatusCode(500, "Internal server error: " + ex.Message);
-        }
-    }
-
-    [HttpGet("ProcessedData")]
-    public async Task<IActionResult> GetProcessedDataAsync()
-    {
-        try
-        {
-            // Fetch user data from the recruitment API
-            var userData = await _recruitmentApiClient.GetUserDataAsync();
-
-            if (userData == null || userData.Count == 0)
+            if (userData == null || !userData.Any())
             {
                 return NotFound("No user data found.");
             }
 
             // Calculate color frequency
-            var colorFrequencyData = _userCalculationService.CalculateColorFrequency(userData);
+            var colorFrequencyData = _userDataProcessor.GetColourFrequencyData(userData).ToArray();
 
             // Calculate age plus twenty
-            var agePlusTwentyData = _userCalculationService.CalculateAgePlusTwenty(userData);
+            var agePlusTwentyData = _userDataProcessor.GetAgePlusTwentyData(userData).ToArray();
 
             // Create a response model or DTO to hold the calculated data
-            var response = new
+            var response = new ResponseDTO
             {
-                ColorFrequency = colorFrequencyData,
-                AgePlusTwenty = agePlusTwentyData
+                Users = userData.ToArray(),
+                TopColours = colorFrequencyData,
+                Ages = agePlusTwentyData   
             };
 
             return Ok(response);

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RecruitmentApiClient\RecruitmentApiClient.csproj" />
+    <ProjectReference Include="..\UserDataProcessor\UserDataProcessor.csproj" />
   </ItemGroup>
 
 </Project>

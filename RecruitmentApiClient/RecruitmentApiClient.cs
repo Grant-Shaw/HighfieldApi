@@ -11,7 +11,7 @@ public class RecruitmentApiClient : IRecruitmentApiClient
     {
         _httpClient = httpClient;
     }  
-    public async Task<IEnumerable<User>> GetUserDataAsync()
+    public async Task<List<User>> GetUserDataAsync()
     {
         try
         {

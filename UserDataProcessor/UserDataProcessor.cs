@@ -8,6 +8,11 @@ public class UserDataProcessor : IUserDataProcessor
     {
         List<UserAgePlusTwentyDTO> agePlusTwentyData = new();
 
+        if (userData == null || !userData.Any())
+        {
+            throw new ArgumentNullException(nameof(userData), "User data is null or empty.");
+        }
+
         foreach (var user in userData)
         {
             if (!string.IsNullOrEmpty(user.Dob))
@@ -19,19 +24,19 @@ public class UserDataProcessor : IUserDataProcessor
 
                     agePlusTwentyData.Add(new UserAgePlusTwentyDTO
                     {
-                        UserId = user.id,
+                        UserId = user.Id,
                         OriginalAge = age,
                         AgePlusTwenty = agePlusTwenty
                     });
                 }
                 else
                 {
-                    throw new InvalidDataException($"The user {user.id} date of birth is not in the correct format");
+                    throw new InvalidDataException($"The user {user.Id} date of birth is not in the correct format");
                 }
             }
             else
             {
-                throw new InvalidDataException($"The user {user.id} does not have a date of birth.");
+                throw new InvalidDataException($"The user {user.Id} does not have a date of birth.");
             }
         }
 
@@ -48,9 +53,9 @@ public class UserDataProcessor : IUserDataProcessor
 
         foreach (var user in userData)
         {
-            if (!string.IsNullOrWhiteSpace(user.favouriteColour))
+            if (!string.IsNullOrWhiteSpace(user.FavouriteColour))
             {
-                string color = user.favouriteColour.Trim().ToLower();
+                string color = user.FavouriteColour.Trim().ToLower();
 
                 if (colorFrequencies.ContainsKey(color))
                 {

@@ -1,4 +1,5 @@
 using RecruitmentApiClient;
+using UserDataProcessor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,5 +32,6 @@ void ConfigureServices(IServiceCollection services)
     services.AddSwaggerGen();
 
     services.AddApiClient();
+    services.AddUserDataProcessor();
     
 }
