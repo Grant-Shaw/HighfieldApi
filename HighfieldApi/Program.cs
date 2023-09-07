@@ -3,11 +3,21 @@ using UserDataProcessor;
 
 var builder = WebApplication.CreateBuilder(args);
 
+ builder.Services.AddCors(options =>
+ {
+    options.AddPolicy("AllowAnyOriginPolicy",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+  });
+
 // Add services to the container.
 builder.Logging.AddConsole();
 ConfigureServices(builder.Services);
 
 var app = builder.Build();
+
+app.UseCors("AllowAnyOriginPolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
