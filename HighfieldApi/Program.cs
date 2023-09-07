@@ -33,5 +33,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddApiClient();
     services.AddUserDataProcessor();
+
+    services.AddMemoryCache();
     
 }
