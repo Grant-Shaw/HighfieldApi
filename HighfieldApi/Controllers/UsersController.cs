@@ -11,11 +11,13 @@ public class UsersController : ControllerBase
 {
     private readonly IRecruitmentApiClient _recruitmentApiClient;
     private readonly IUserDataProcessor _userDataProcessor;
+    private readonly ILogger<UsersController> _logger;
 
-    public UsersController(IRecruitmentApiClient recruitmentApiService, IUserDataProcessor userDataProcessor)
+    public UsersController(IRecruitmentApiClient recruitmentApiService, IUserDataProcessor userDataProcessor, ILogger<UsersController> logger)
     {
         _recruitmentApiClient = recruitmentApiService;
         _userDataProcessor = userDataProcessor;
+        _logger = logger;
     }
 
     [HttpGet("UserData")]
@@ -32,15 +34,15 @@ public class UsersController : ControllerBase
             }
 
             // Calculate color frequency
-            var colorFrequencyData = _userDataProcessor.GetColourFrequencyData(userData).ToArray();
+            var colorFrequencyData = _userDataProcessor.GetColourFrequencyData(userData);
 
             // Calculate age plus twenty
-            var agePlusTwentyData = _userDataProcessor.GetAgePlusTwentyData(userData).ToArray();
+            var agePlusTwentyData = _userDataProcessor.GetAgePlusTwentyData(userData);
 
             // Create a response model or DTO to hold the calculated data
             var response = new ResponseDTO
             {
-                Users = userData.ToArray(),
+                Users = userData,
                 TopColours = colorFrequencyData,
                 Ages = agePlusTwentyData   
             };
@@ -49,8 +51,10 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Handle exceptions and log errors
+            // Handle exceptions
+            _logger.LogError("An Exception occurred {Type}, Message: {message}", ex.GetType(), ex.Message);
             return StatusCode(500, "Internal server error: " + ex.Message);
+
         }
     }
 }

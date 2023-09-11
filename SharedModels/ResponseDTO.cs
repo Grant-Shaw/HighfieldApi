@@ -2,7 +2,7 @@
 
 public class ResponseDTO
 {
-    public User[]? Users { get; set; }
-    public UserAgePlusTwentyDTO[]? Ages { get; set; }
-    public UserColorFrequencyDTO[]? TopColours { get; set; }
+    public IEnumerable<User>? Users { get; set; }
+    public IEnumerable<UserAgePlusTwentyDTO>? Ages { get; set; }
+    public IEnumerable<UserColorFrequencyDTO>? TopColours { get; set; }
 }
